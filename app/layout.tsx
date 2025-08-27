@@ -1,5 +1,4 @@
 // app/layout.tsx
-
 import "./globals.css";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
@@ -18,8 +17,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-gray-900">
-        <Navbar />
         <SwipeProvider>
+          <Navbar />
           <main className="mx-auto max-w-4xl px-4 pt-26 pb-24">{children}</main>
         </SwipeProvider>
       </body>
