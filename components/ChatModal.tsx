@@ -1,51 +1,71 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import ChatInput from "@/components/ChatInput";
+import ChatMessage, { ChatMsg } from "@/components/ChatMessage";
 
 export default function ChatModal() {
-  const [messages, setMessages] = useState<string[]>([]);
-  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<ChatMsg[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [adapter, setAdapter] = useState<string | null>(null); // Selected adapter
 
-  const handleSend = () => {
+  // Generate simple unique IDs for messages
+  const generateId = () => Math.random().toString(36).substr(2, 9);
+
+  const handleSend = async (input: string) => {
     if (!input.trim()) return;
-    setMessages([...messages, input]);
-    setInput("");
+
+    const userMsg: ChatMsg = { id: generateId(), text: input, role: "user" };
+    setMessages((prev) => [...prev, userMsg]);
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/proxy?path=/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input, adapter }),
+      });
+      const data = await res.json();
+
+      const botMsg: ChatMsg = {
+        id: generateId(),
+        text: data.response,
+        role: "assistant",
+      };
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (error) {
+      const errorMsg: ChatMsg = {
+        id: generateId(),
+        text: "Error: failed to get response from AI backend.",
+        role: "assistant",
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="default" className="w-full">💬 Chat</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Chat</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto border p-2 rounded-md">
-          {messages.map((msg, idx) => (
-            <div key={idx} className="p-2 bg-muted rounded-md">
-              {msg}
-            </div>
-          ))}
-        </div>
-        <div className="flex gap-2 mt-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 border rounded-md p-2"
-          />
-          <Button onClick={handleSend}>Send</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <div className="flex flex-col max-w-lg mx-auto p-4 border rounded-md">
+      <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto mb-3 bg-gray-50 p-2">
+        {messages.map((msg) => (
+          <ChatMessage key={msg.id} msg={msg} />
+        ))}
+        {loading && <div className="italic text-gray-500">Assistant is typing...</div>}
+      </div>
+
+      {/* Optional: Adapter selection (expand later) */}
+      {/* <select
+        value={adapter || ""}
+        onChange={(e) => setAdapter(e.target.value)}
+        className="mb-2 border p-2 rounded"
+      >
+        <option value="">Base</option>
+        <option value="personalization">Personalization</option>
+        <option value="game_assist">Game Assist</option>
+      </select> */}
+
+      <ChatInput onSend={handleSend} disabled={loading} />
+    </div>
   );
 }

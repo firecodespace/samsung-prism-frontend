@@ -1,4 +1,3 @@
-// app/chatbot/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -14,12 +13,17 @@ export default function ChatbotPage() {
   const [loading, setLoading] = useState(false);
 
   async function handleSend(text: string) {
+    if (!text.trim()) return;
     const you: ChatMsg = { id: nanoid(), role: "user", text };
     setMessages((m) => [...m, you]);
     setLoading(true);
     try {
       const reply = await chatOnce(text);
-      const bot: ChatMsg = { id: nanoid(), role: "assistant", text: reply || "(no reply)" };
+      const bot: ChatMsg = {
+        id: nanoid(),
+        role: "assistant",
+        text: reply || "(no reply)",
+      };
       setMessages((m) => [...m, bot]);
     } catch (err: any) {
       const bot: ChatMsg = {

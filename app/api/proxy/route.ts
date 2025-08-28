@@ -1,4 +1,3 @@
-// app/api/proxy/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { MOBILE_API_BASE } from "@/lib/config";
 
@@ -13,13 +12,14 @@ export async function POST(req: NextRequest) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
-    // You can add auth headers here if your phone API requires them.
   });
 
   const text = await upstream.text();
   return new NextResponse(text, {
     status: upstream.status,
-    headers: { "Content-Type": upstream.headers.get("Content-Type") || "application/json" },
+    headers: {
+      "Content-Type": upstream.headers.get("Content-Type") || "application/json",
+    },
   });
 }
 
@@ -32,6 +32,8 @@ export async function GET(req: NextRequest) {
   const text = await upstream.text();
   return new NextResponse(text, {
     status: upstream.status,
-    headers: { "Content-Type": upstream.headers.get("Content-Type") || "application/json" },
+    headers: {
+      "Content-Type": upstream.headers.get("Content-Type") || "application/json",
+    },
   });
 }

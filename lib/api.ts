@@ -1,25 +1,6 @@
-// lib/api.ts
 import axios from "axios";
 import { MOBILE_API_BASE } from "./config";
 
-/**
- * Direct call to the phone (CORS may block in browsers).
- * Prefer going through /api/proxy in production web.
- */
-export async function sendToPhone<T = any>(
-  path: string,
-  data?: unknown,
-  init?: { method?: "POST" | "GET" }
-): Promise<T> {
-  const method = init?.method ?? "POST";
-  const url = `${MOBILE_API_BASE}${path}`;
-  const res = await axios.request<T>({ url, method, data });
-  return res.data;
-}
-
-/**
- * Safer: web -> Next API route -> phone (bypasses CORS via server side).
- */
 export async function sendViaProxy<T = any>(
   path: string,
   payload?: unknown,
@@ -34,13 +15,17 @@ export async function sendViaProxy<T = any>(
   return res.data;
 }
 
-// Chat helpers
-export async function chatOnce(prompt: string): Promise<string> {
-  const data = await sendViaProxy<{ reply: string }>("/chat", { prompt });
-  return data.reply ?? "";
+export async function chatOnce(
+  message: string,
+  adapter?: string
+): Promise<string> {
+  const payload: { message: string; adapter?: string } = { message };
+  if (adapter) payload.adapter = adapter;
+
+  const data = await sendViaProxy<{ response: string }>("/message", payload);
+  return data.response ?? "";
 }
 
-// Analysis helpers
 export type SeriesPoint = { t: number; v: number };
 export async function fetchPerformance(
   playerId: string

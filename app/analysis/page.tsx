@@ -3,6 +3,10 @@
 
 import { useEffect, useState } from "react";
 import Graph, { Point } from "@/components/Graph";
+// Make sure fetchPerformance is exported from "@/lib/api"
+// If it's a default export, use:
+// import fetchPerformance from "@/lib/api";
+// Otherwise, ensure the named export exists in the module.
 import { fetchPerformance } from "@/lib/api";
 
 export default function AnalysisPage() {
