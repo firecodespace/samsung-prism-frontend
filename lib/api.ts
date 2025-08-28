@@ -1,7 +1,7 @@
 import axios from "axios";
 import { MOBILE_API_BASE } from "./config";
 
-export async function sendViaProxy<T = any>(
+export async function sendViaProxy<T = unknown>(
   path: string,
   payload?: unknown,
   init?: { method?: "POST" | "GET" }

@@ -7,7 +7,8 @@ import ChatMessage, { ChatMsg } from "@/components/ChatMessage";
 export default function ChatModal() {
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [loading, setLoading] = useState(false);
-  const [adapter, setAdapter] = useState<string | null>(null); // Selected adapter
+  // Commented out unused setter variable to fix warning
+  // const [_adapter, setAdapter] = useState<string | null>(null); // Selected adapter
 
   // Generate simple unique IDs for messages
   const generateId = () => Math.random().toString(36).substr(2, 9);
@@ -23,7 +24,7 @@ export default function ChatModal() {
       const res = await fetch("/api/proxy?path=/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input, adapter }),
+        body: JSON.stringify({ message: input /*, adapter*/ }),
       });
       const data = await res.json();
 
@@ -33,7 +34,7 @@ export default function ChatModal() {
         role: "assistant",
       };
       setMessages((prev) => [...prev, botMsg]);
-    } catch (error) {
+    } catch (_error: unknown) {
       const errorMsg: ChatMsg = {
         id: generateId(),
         text: "Error: failed to get response from AI backend.",
