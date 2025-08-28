@@ -25,7 +25,7 @@ export default function ChatbotPage() {
         text: reply || "(no reply)",
       };
       setMessages((m) => [...m, bot]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       const bot: ChatMsg = {
         id: nanoid(),
         role: "assistant",
