@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import SwipeProvider from "@/components/SwipeProvider";
 
 export const metadata: Metadata = {
-  title: "Anywhere GPT (Local)",
+  title: "On Device LLM - 42X007",
   description: "Responsive UI for your local LLM running on a phone",
 };
 
